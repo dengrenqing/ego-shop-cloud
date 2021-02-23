@@ -1,0 +1,28 @@
+server:  # 把端口写活 方便部署
+    port: ${PORT:8761}
+spring:
+    application:
+        name: eureka-server
+    security:  # 搞一个用户名和密码保护eureka-server
+        user:
+            name: admin
+            password: admin
+eureka:
+    client:
+        service-url:
+            defaultZone: ${EUREKA_SERVER:http://admin:admin@localhost:8761/eureka}
+        fetch-registry: true
+        register-with-eureka: true
+    instance:
+        hostname: ${HOST:localhost}
+        instance-id: ${eureka.instance.hostname}:${spring.application.name}:${server.port}  # 显示服务名称
+        prefer-ip-address: ${PREFER_IP_ADDRESS:true}
+        lease-renewal-interval-in-seconds: 3 # 续约实例的时间
+        lease-expiration-duration-in-seconds: 9  # 剔除节点的时间
+    server:
+        response-cache-auto-expiration-in-seconds: 30 # 设置eureka-server向client响应的缓存列表的时间
+management:
+    endpoints:
+        web:
+            exposure:
+                include: '*'  # 暴露健康检查的端点
