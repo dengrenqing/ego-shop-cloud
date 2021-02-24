@@ -6,6 +6,8 @@
     <modules>
         <module>cloud-iaas</module>
         <module>ego-common</module>
+        <module>ego-manager</module>
+        <module>ego-product</module>
     </modules>
     <!--父项目还是boot项目-->
     <parent>
@@ -97,6 +99,11 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql-connector.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tobato</groupId>
+                <artifactId>fastdfs-client</artifactId>
+                <version>${fastDFS.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
