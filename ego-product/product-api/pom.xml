@@ -17,5 +17,10 @@
             <artifactId>ego-common</artifactId>
             <version>1.0</version>
         </dependency>
+        <!--es的依赖 启动导入商品和增量导入-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
     </dependencies>
 </project>

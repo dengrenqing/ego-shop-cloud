@@ -150,14 +150,14 @@ public class Sku implements Serializable {
      */
     @TableField(value = "status")
     @ApiModelProperty(value="0 禁用 1 启用")
-    private Byte status;
+    private Integer status;
 
     /**
      * 0 正常 1 已被删除
      */
     @TableField(value = "is_delete")
     @ApiModelProperty(value="0 正常 1 已被删除")
-    private Byte isDelete;
+    private Integer isDelete;
 
     private static final long serialVersionUID = 1L;
 
