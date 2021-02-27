@@ -66,7 +66,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
      * 新增商品分类
      * 删除所有相关缓存 不然出现脏读
      *
-     * @param entity
+     * @param category
      * @return
      */
     @Override
@@ -88,9 +88,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         } else {
             // 新增子节点
             // 校验一下
-            Category parent = categoryMapper.selectOne(new LambdaQueryWrapper<Category>()
-                    .eq(Category::getParentId, parentId)
-            );
+//            Category parent = categoryMapper.selectOne(new LambdaQueryWrapper<Category>()
+//                    .eq(Category::getParentId, parentId)
+//            );
+            Category parent = categoryMapper.selectById(parentId);
             if (ObjectUtils.isEmpty(parent)) {
                 // 父节点不存在
                 throw new IllegalArgumentException("新增商品分类时父节点不存在");

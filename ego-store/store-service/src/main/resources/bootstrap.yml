@@ -1,9 +1,9 @@
 spring:
     application:
-        name: auth-server
+        name: store-service
     cloud:
         config:
-            name: auth-server
+            name: store-service
             profile: dev
             label: master
             discovery:

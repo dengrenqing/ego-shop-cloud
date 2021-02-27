@@ -36,5 +36,18 @@ public class ProdController {
     }
 
 
+    /**
+     * 提供调用根据id查询商品信息
+     *
+     * @param prodId
+     * @return
+     */
+    @GetMapping("findProdById")
+    @ApiOperation("新增商品")
+    Prod findProdById(@RequestParam("prodId") Long prodId) {
+        return prodService.getById(prodId);
+    }
+
+
 }
 

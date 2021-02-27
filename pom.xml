@@ -8,6 +8,7 @@
         <module>ego-common</module>
         <module>ego-manager</module>
         <module>ego-product</module>
+        <module>ego-store</module>
     </modules>
     <!--父项目还是boot项目-->
     <parent>

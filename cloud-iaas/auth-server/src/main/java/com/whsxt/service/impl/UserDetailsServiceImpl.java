@@ -1,10 +1,16 @@
 package com.whsxt.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.whsxt.constant.AuthConstant;
 import com.whsxt.domain.SysUser;
+import com.whsxt.domain.User;
 import com.whsxt.mapper.SysUserMapper;
+import com.whsxt.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,11 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +36,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private SysUserMapper sysUserMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value("${wx.appid}")
+    private String appid;
+
+    @Value("${wx.appsecret}")
+    private String appsecret;
+
+    @Value("${wx.url}")
+    private String WX_AUTH_TOKEN_URL;
 
     /**
      * 登录方法
@@ -65,10 +87,44 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 }
                 return sysUser;
             case AuthConstant.MEMBER:
-                // 查前台的表
+                String url = String.format(WX_AUTH_TOKEN_URL, appid, appsecret, username);
+                String wxStr = restTemplate.getForObject(url, String.class);
+                // 转成json
+                JSONObject wxJson = JSON.parseObject(wxStr);
+                String openid = wxJson.getString("openid");
+                if (!StringUtils.isEmpty(openid)) {
+                    // 查询数据库 mysql 如果有 如果没有直接就注册了
+                    User user = userMapper.selectById(openid);
+                    if (ObjectUtils.isEmpty(user)) {
+                        // 注册
+                        user = addUser(openid);
+                    }
+                    return user;
+                }
                 return null;
             default:
                 return null;
         }
+    }
+
+    /**
+     * 注册用户的方法 因为 微信不需要注册 所以当用户第一登录我们就需要给他注册
+     *
+     * @param openid
+     * @return
+     */
+    private User addUser(String openid) {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+        String ip = request.getRemoteAddr();
+        User user = new User();
+        user.setUserId(openid);
+        user.setStatus(1);
+        user.setUserRegtime(new Date());
+        user.setUserLasttime(new Date());
+        user.setModifyTime(new Date());
+        user.setUserLastip(ip);
+        userMapper.insert(user);
+        return user;
     }
 }
