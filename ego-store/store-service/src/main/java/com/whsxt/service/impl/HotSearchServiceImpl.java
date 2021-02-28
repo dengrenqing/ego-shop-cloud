@@ -41,7 +41,7 @@ public class HotSearchServiceImpl extends ServiceImpl<HotSearchMapper, HotSearch
         return hotSearchMapper.selectPage(page, new LambdaQueryWrapper<HotSearch>()
                 .eq(hotSearch.getStatus() != null, HotSearch::getStatus, hotSearch.getStatus())
                 .like(StringUtils.hasText(hotSearch.getTitle()), HotSearch::getTitle, hotSearch.getTitle())
-                .like(StringUtils.hasText(hotSearch.getTitle()), HotSearch::getContent, hotSearch.getContent())
+                .like(StringUtils.hasText(hotSearch.getContent()), HotSearch::getContent, hotSearch.getContent())
         );
     }
 

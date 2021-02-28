@@ -1,0 +1,108 @@
+package com.whsxt.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.whsxt.mapper.UserAddrMapper;
+import com.whsxt.domain.UserAddr;
+import com.whsxt.service.UserAddrService;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
+
+/**
+ * @Author 武汉尚学堂
+ */
+@Service
+@Slf4j
+@CacheConfig(cacheNames = "com.whsxt.service.impl.UserAddrServiceImpl")
+public class UserAddrServiceImpl extends ServiceImpl<UserAddrMapper, UserAddr> implements UserAddrService {
+
+    @Autowired
+    private UserAddrMapper userAddrMapper;
+
+
+    /**
+     * 全查询用户的收货地址
+     *
+     * @param openId
+     * @return
+     */
+    @Override
+    @Cacheable(key = "#openId")
+    public List<UserAddr> findUserAddr(String openId) {
+        List<UserAddr> userAddrs = userAddrMapper.selectList(new LambdaQueryWrapper<UserAddr>()
+                .eq(UserAddr::getUserId, openId)
+                .eq(UserAddr::getStatus, 1)
+        );
+        return userAddrs;
+    }
+
+
+    @Override
+    @CacheEvict(key = "#userAddr.userId")
+    public boolean save(UserAddr userAddr) {
+        log.info("新增用户收货地址");
+        userAddr.setUpdateTime(new Date());
+        userAddr.setCreateTime(new Date());
+        userAddr.setStatus(1);
+        userAddr.setVersion(0);
+        // 业务 如果用户之前没有收货地址 那么你新增的这一条就是默认收货地址
+        Integer count = userAddrMapper.selectCount(new LambdaQueryWrapper<UserAddr>()
+                .eq(UserAddr::getUserId, userAddr.getUserId())
+                .eq(UserAddr::getCommonAddr, 1)
+        );
+        if (count <= 0) {
+            // 之前就没有 我们就设置当前新增的是默认收货地址
+            userAddr.setCommonAddr(1);
+        }
+        return userAddrMapper.insert(userAddr) > 0;
+    }
+
+    /**
+     * 修改默认收货地址
+     * 修改一个数据
+     * 日志要怎么记录？？
+     * 记录的时候 要把之前的信息记录下来 把改后的信息记录下来 这样方便后期出了问题 做数据的回溯
+     * 核心关键日志放在es 方便做数据的分析
+     * 通过一个mq 把日志消息发送到 logs-service  记录es
+     *
+     * @param openId
+     * @param id
+     */
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public void changeUserDefaultAddr(String openId, Long id) {
+        // 查询到之前的默认地址
+        UserAddr oldAddr = userAddrMapper.selectOne(new LambdaQueryWrapper<UserAddr>()
+                .eq(UserAddr::getUserId, openId)
+                .eq(UserAddr::getCommonAddr, 1)
+        );
+        if (!ObjectUtils.isEmpty(oldAddr)) {
+            // 把旧的收货地址 改一下
+            oldAddr.setUpdateTime(new Date());
+            oldAddr.setCommonAddr(0);
+            // 插入进去
+            userAddrMapper.updateById(oldAddr);
+        }
+        // 设置新的了
+        // 查询用户新的收货地址
+        UserAddr newAddr = userAddrMapper.selectById(id);
+        if (ObjectUtils.isEmpty(newAddr)) {
+            log.error("新的默认地址的id不存在");
+            throw new IllegalArgumentException("新的默认地址的id不存在");
+        }
+        newAddr.setCommonAddr(1);
+        newAddr.setUpdateTime(new Date());
+        userAddrMapper.updateById(newAddr);
+    }
+}

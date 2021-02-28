@@ -43,7 +43,7 @@ public class AreaController {
 
     @GetMapping("listByPid")
     @ApiOperation("根据父id查询地址集合")
-    @PreAuthorize("hasAuthority('admin:area:info')")
+//    @PreAuthorize("hasAuthority('admin:area:info')")
     public ResponseEntity<List<Area>> listByPid(Long pid) {
         List<Area> areas = areaService.findAreaByPid(pid);
         return ResponseEntity.ok(areas);

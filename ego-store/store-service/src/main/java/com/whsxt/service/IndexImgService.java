@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.whsxt.domain.IndexImg;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.whsxt.vo.IndexImgVo;
+
+import java.util.List;
 
 /**
  * @Author 武汉尚学堂
@@ -27,4 +30,12 @@ public interface IndexImgService extends IService<IndexImg> {
      * @return
      */
     IndexImg findIndexImgById(Long id);
+
+    /**
+     * 加载前台轮播图接口
+     *
+     * @return
+     */
+    List<IndexImgVo> findFrontIndexImg();
+
 }

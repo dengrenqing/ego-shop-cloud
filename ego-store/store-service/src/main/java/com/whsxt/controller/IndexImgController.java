@@ -4,12 +4,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.whsxt.domain.IndexImg;
 import com.whsxt.service.IndexImgService;
+import com.whsxt.vo.IndexImgVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @Author 武汉尚学堂
@@ -49,5 +52,18 @@ public class IndexImgController {
         return ResponseEntity.ok(indexImg);
     }
 
+
+    // -----------------下面是前台代码了
+    // 因为微信小程序的性能比较差 基本知识  前台代码的大小必须要小于  4M
+    // 性能比较差 http请求的响应的时候 处理的数据包不能过大 专门封装对象
+
+    @GetMapping("indexImgs")
+    @ApiOperation("加载前台轮播图接口")
+    public ResponseEntity<List<IndexImgVo>> loadFrontIndexImg() {
+        List<IndexImgVo> indexImgVos = indexImgService.findFrontIndexImg();
+        return ResponseEntity.ok(indexImgVos);
+    }
+
+    // --------------------下面提供远程调用的接口
 
 }

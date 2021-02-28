@@ -1,11 +1,13 @@
 package com.whsxt.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.whsxt.constant.ProdTagConstant;
+import com.whsxt.vo.ProdTagVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -14,6 +16,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -52,6 +56,7 @@ public class ProdTagServiceImpl extends ServiceImpl<ProdTagMapper, ProdTag> impl
         );
     }
 
+
     @Override
     @CacheEvict(key = ProdTagConstant.PROD_TAG_PREFIX)
     public boolean save(ProdTag prodTag) {
@@ -71,4 +76,27 @@ public class ProdTagServiceImpl extends ServiceImpl<ProdTagMapper, ProdTag> impl
         );
         return prodTags;
     }
+
+
+    /**
+     * 加载前台的标签分组
+     *
+     * @return
+     */
+    @Override
+    public List<ProdTagVo> findProdTagVo() {
+        List<ProdTag> prodTags = prodTagMapper.selectList(new LambdaQueryWrapper<ProdTag>()
+                .eq(ProdTag::getStatus, 1)
+                .orderByAsc(ProdTag::getSeq)
+        );
+        ArrayList<ProdTagVo> prodTagVos = new ArrayList<>(prodTags.size() * 2);
+        prodTags.forEach(prodTag -> {
+            ProdTagVo prodTagVo = new ProdTagVo();
+            BeanUtil.copyProperties(prodTag, prodTagVo);
+            prodTagVos.add(prodTagVo);
+        });
+        return prodTagVos;
+    }
+
+
 }

@@ -4,13 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.whsxt.constant.AuthConstant;
+import com.whsxt.domain.MyUserDetail;
 import com.whsxt.domain.SysUser;
 import com.whsxt.domain.User;
+import com.whsxt.mapper.MyUserDetailMapper;
 import com.whsxt.mapper.SysUserMapper;
 import com.whsxt.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,7 +24,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -38,6 +38,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private MyUserDetailMapper myUserDetailMapper;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -94,12 +97,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 String openid = wxJson.getString("openid");
                 if (!StringUtils.isEmpty(openid)) {
                     // 查询数据库 mysql 如果有 如果没有直接就注册了
-                    User user = userMapper.selectById(openid);
-                    if (ObjectUtils.isEmpty(user)) {
+
+                    MyUserDetail myUserDetail = myUserDetailMapper.selectById(openid);
+//
+//                    User user = userMapper.selectById(openid);
+
+
+                    if (ObjectUtils.isEmpty(myUserDetail)) {
                         // 注册
-                        user = addUser(openid);
+                        myUserDetail = addUser(openid);
                     }
-                    return user;
+                    return myUserDetail;
                 }
                 return null;
             default:
@@ -113,7 +121,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @param openid
      * @return
      */
-    private User addUser(String openid) {
+    private MyUserDetail addUser(String openid) {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = requestAttributes.getRequest();
         String ip = request.getRemoteAddr();
@@ -125,6 +133,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         user.setModifyTime(new Date());
         user.setUserLastip(ip);
         userMapper.insert(user);
-        return user;
+        // 组装返回值 返回
+        MyUserDetail myUserDetail = new MyUserDetail();
+        myUserDetail.setUserId(openid);
+        myUserDetail.setStatus(1);
+        return myUserDetail;
     }
 }
