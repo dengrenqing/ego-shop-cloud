@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import com.whsxt.mapper.UserCollectionMapper;
 import com.whsxt.domain.UserCollection;
 import com.whsxt.service.UserCollectionService;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @Author 武汉尚学堂
@@ -65,5 +67,48 @@ public class UserCollectionServiceImpl extends ServiceImpl<UserCollectionMapper,
         prodEsPage.setTotal(collectionPage.getTotal());
         prodEsPage.setRecords(prodEsList);
         return prodEsPage;
+    }
+
+    /**
+     * 查询用户是否收藏该商品
+     *
+     * @param prodId
+     * @param openId
+     * @return
+     */
+    @Override
+    public Boolean findUserIsCollect(Long prodId, String openId) {
+        Integer count = userCollectionMapper.selectCount(new LambdaQueryWrapper<UserCollection>()
+                .eq(UserCollection::getUserId, openId)
+                .eq(UserCollection::getProdId, prodId)
+        );
+        return count > 0;
+    }
+
+    /**
+     * 用户添加或者取消收藏该商品
+     *
+     * @param prodId
+     * @param openId
+     */
+    @Override
+    public void addOrCancelCollect(Long prodId, String openId) {
+        // 查询这个商品之前有没有被这个用户收藏过
+        UserCollection userCollection = userCollectionMapper.selectOne(new LambdaQueryWrapper<UserCollection>()
+                .eq(UserCollection::getUserId, openId)
+                .eq(UserCollection::getProdId, prodId)
+        );
+        if (ObjectUtils.isEmpty(userCollection)) {
+            // 没有收藏 就要收藏了
+            UserCollection newCollect = new UserCollection();
+            newCollect.setProdId(prodId);
+            newCollect.setUserId(openId);
+            newCollect.setCreateTime(new Date());
+            // 操作数据库
+            userCollectionMapper.insert(newCollect);
+            return;
+        }
+        // 如果之前有 就要取消
+        userCollectionMapper.deleteById(userCollection.getId());
     }
 }

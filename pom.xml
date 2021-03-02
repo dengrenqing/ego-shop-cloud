@@ -11,6 +11,7 @@
         <module>ego-store</module>
         <module>ego-search</module>
         <module>ego-member</module>
+        <module>ego-message</module>
     </modules>
     <!--父项目还是boot项目-->
     <parent>

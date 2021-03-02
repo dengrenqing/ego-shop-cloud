@@ -20,4 +20,22 @@ public interface UserCollectionService extends IService<UserCollection> {
      * @return
      */
     IPage<ProdEs> findUserCollectProd(Page<UserCollection> page, String openId);
+
+
+    /**
+     * 查询用户是否收藏该商品
+     *
+     * @param prodId
+     * @param openId
+     * @return
+     */
+    Boolean findUserIsCollect(Long prodId, String openId);
+
+    /**
+     * 用户添加或者取消收藏该商品
+     *
+     * @param prodId
+     * @param openId
+     */
+    void addOrCancelCollect(Long prodId, String openId);
 }

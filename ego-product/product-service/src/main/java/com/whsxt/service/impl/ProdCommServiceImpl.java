@@ -4,14 +4,20 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.whsxt.dao.ProdEsDao;
 import com.whsxt.domain.Prod;
+import com.whsxt.es.ProdEs;
 import com.whsxt.mapper.ProdMapper;
+import com.whsxt.vo.ProdCommResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -33,6 +39,9 @@ public class ProdCommServiceImpl extends ServiceImpl<ProdCommMapper, ProdComm> i
 
     @Autowired
     private ProdMapper prodMapper;
+
+    @Autowired
+    private ProdEsDao prodEsDao;
 
 
     /**
@@ -86,5 +95,53 @@ public class ProdCommServiceImpl extends ServiceImpl<ProdCommMapper, ProdComm> i
             });
         }
         return prodCommPage;
+    }
+
+
+    /**
+     * 前台查询商品的评论总览
+     *
+     * @param prodId
+     * @return
+     */
+    @Override
+    public ProdCommResult findFrontProdComm(Long prodId) {
+        ProdCommResult prodCommResult = new ProdCommResult();
+        // 直接从es拿好评率
+        Optional<ProdEs> optionalProdEs = prodEsDao.findById(prodId);
+        ProdEs prodEs = optionalProdEs.get();
+        // 好评率
+        BigDecimal positiveRating = prodEs.getPositiveRating();
+        // 好评数
+        Long praiseNumber = prodEs.getPraiseNumber();
+        // 总评数 总的数量太多了 占内存 jvm可能直接爆炸
+//        List<ProdComm> prodComms = prodCommMapper.selectList(new LambdaQueryWrapper<ProdComm>()
+//                .eq(ProdComm::getProdId, prodId)
+//        );
+        Integer totalCount = prodCommMapper.selectCount(new LambdaQueryWrapper<ProdComm>()
+                .eq(ProdComm::getProdId, prodId)
+        );
+        Integer secondCount = prodCommMapper.selectCount(new LambdaQueryWrapper<ProdComm>()
+                .eq(ProdComm::getProdId, prodId)
+                .eq(ProdComm::getEvaluate, 1)
+        );
+
+        Integer badCount = prodCommMapper.selectCount(new LambdaQueryWrapper<ProdComm>()
+                .eq(ProdComm::getProdId, prodId)
+                .eq(ProdComm::getEvaluate, 2)
+        );
+
+        Integer picCount = prodCommMapper.selectCount(new LambdaQueryWrapper<ProdComm>()
+                .eq(ProdComm::getProdId, prodId)
+                .isNotNull(ProdComm::getPics)
+        );
+
+        prodCommResult.setNumber(totalCount);
+        prodCommResult.setNegativeNumber(badCount);
+        prodCommResult.setSecondaryNumber(secondCount);
+        prodCommResult.setPicNumber(picCount);
+        prodCommResult.setPositiveRating(positiveRating);
+        prodCommResult.setPraiseNumber(praiseNumber);
+        return prodCommResult;
     }
 }

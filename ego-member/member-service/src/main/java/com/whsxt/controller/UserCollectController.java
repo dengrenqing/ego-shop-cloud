@@ -12,7 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.PostConstruct;
 
 /**
  * @Author 武汉尚学堂
@@ -43,5 +47,21 @@ public class UserCollectController {
         return ResponseEntity.ok(prodEsIPage);
     }
 
+    @GetMapping("/p/user/collection/isCollection")
+    @ApiOperation("查询用户是否收藏该商品")
+    public ResponseEntity<Boolean> findUserCollectProd(Long prodId) {
+        String openId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        Boolean flag = userCollectionService.findUserIsCollect(prodId, openId);
+        return ResponseEntity.ok(flag);
+    }
+
+
+    @PostMapping("/p/user/collection/addOrCancel")
+    @ApiOperation("用户添加或者取消收藏该商品")
+    public ResponseEntity<Void> addOrCancel(@RequestBody Long prodId) {
+        String openId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        userCollectionService.addOrCancelCollect(prodId, openId);
+        return ResponseEntity.ok().build();
+    }
 
 }

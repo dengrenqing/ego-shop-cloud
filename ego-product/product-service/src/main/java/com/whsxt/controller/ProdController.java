@@ -48,6 +48,14 @@ public class ProdController {
         return prodService.getById(prodId);
     }
 
+    // 前台的接口
+    @GetMapping("prod/prodInfo")
+    @ApiOperation("前台根据id查询商品的信息（包括了sku）")
+    public ResponseEntity<Prod> frontFindProdById(Long prodId) {
+        Prod prod = prodService.findProdAndSkuById(prodId);
+        return ResponseEntity.ok(prod);
+    }
+
 
 }
 

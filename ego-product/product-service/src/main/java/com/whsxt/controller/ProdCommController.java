@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.whsxt.domain.ProdComm;
 import com.whsxt.service.ProdCommService;
+import com.whsxt.vo.ProdCommResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
@@ -33,5 +34,12 @@ public class ProdCommController {
         return ResponseEntity.ok(prodCommIPage);
     }
 
+
+    @GetMapping("prodComm/prodCommData")
+    @ApiOperation("前台查询商品的评论总览")
+    public ResponseEntity<ProdCommResult> getFrontProdComm(Long prodId) {
+        ProdCommResult prodCommResult = prodCommService.findFrontProdComm(prodId);
+        return ResponseEntity.ok(prodCommResult);
+    }
 
 }

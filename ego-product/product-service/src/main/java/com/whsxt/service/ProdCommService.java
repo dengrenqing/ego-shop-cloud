@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.whsxt.domain.ProdComm;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.whsxt.vo.ProdCommResult;
 
 /**
  * @Author 武汉尚学堂
@@ -20,4 +21,11 @@ public interface ProdCommService extends IService<ProdComm> {
      */
     IPage<ProdComm> findProdCommPage(Page<ProdComm> page, ProdComm prodComm);
 
+    /**
+     * 前台查询商品的评论总览
+     *
+     * @param prodId
+     * @return
+     */
+    ProdCommResult findFrontProdComm(Long prodId);
 }

@@ -13,6 +13,8 @@ import com.whsxt.service.ProdTagReferenceService;
 import com.whsxt.service.SkuService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -28,6 +30,7 @@ import com.whsxt.domain.Prod;
 import com.whsxt.service.ProdService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -35,6 +38,7 @@ import org.springframework.util.StringUtils;
  */
 @Service
 @Slf4j
+@CacheConfig(cacheNames = "com.whsxt.service.impl.ProdServiceImpl")
 public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements ProdService {
 
     @Autowired
@@ -253,5 +257,27 @@ public class ProdServiceImpl extends ServiceImpl<ProdMapper, Prod> implements Pr
             }
         });
         return prodPage;
+    }
+
+    /**
+     * 前台根据id查询商品的信息（包括了sku）
+     *
+     * @param prodId
+     * @return
+     */
+    @Override
+    @Cacheable(key = "#prodId")
+    public Prod findProdAndSkuById(Long prodId) {
+        // 查询数据库
+        Prod prod = prodMapper.selectById(prodId);
+        if (ObjectUtils.isEmpty(prod)) {
+            return null;
+        }
+        // 如果有商品 查询sku的集合
+        List<Sku> list = skuService.list(new LambdaQueryWrapper<Sku>()
+                .eq(Sku::getProdId, prod.getProdId())
+        );
+        prod.setSkuList(list);
+        return prod;
     }
 }

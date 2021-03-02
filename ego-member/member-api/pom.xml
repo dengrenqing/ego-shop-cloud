@@ -12,6 +12,11 @@
     <artifactId>member-api</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>com.whsxt</groupId>
+            <artifactId>message-api</artifactId>
+            <version>1.0</version>
+        </dependency>
 
         <dependency>
             <groupId>com.whsxt</groupId>
