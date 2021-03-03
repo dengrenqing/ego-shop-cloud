@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -81,6 +82,18 @@ public class UserController {
         rabbitTemplate.convertAndSend(QueueConstant.WECHAT_SEND_EX, QueueConstant.WECHAT_SEND_KEY, JSON.toJSONString(wxMsgModel));
 
         return ResponseEntity.ok("发送成功");
+    }
+
+    /**
+     * 远程调用获取用户信息集合
+     *
+     * @param userIds
+     * @return
+     */
+    @PostMapping("/p/findUserInfoByUserIds")
+    @ApiOperation("根据ids获取用户信息集合")
+    List<User> findUserInfoByUserIds(@RequestBody List<String> userIds) {
+        return userService.listByIds(userIds);
     }
 
 

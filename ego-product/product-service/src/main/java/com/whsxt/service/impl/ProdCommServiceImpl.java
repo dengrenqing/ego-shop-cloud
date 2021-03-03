@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.whsxt.dao.ProdEsDao;
 import com.whsxt.domain.Prod;
+import com.whsxt.domain.User;
 import com.whsxt.es.ProdEs;
+import com.whsxt.feign.ProdCommMemberFeign;
 import com.whsxt.mapper.ProdMapper;
 import com.whsxt.vo.ProdCommResult;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +44,9 @@ public class ProdCommServiceImpl extends ServiceImpl<ProdCommMapper, ProdComm> i
 
     @Autowired
     private ProdEsDao prodEsDao;
+
+    @Autowired
+    private ProdCommMemberFeign prodCommMemberFeign;
 
 
     /**
@@ -143,5 +148,48 @@ public class ProdCommServiceImpl extends ServiceImpl<ProdCommMapper, ProdComm> i
         prodCommResult.setPositiveRating(positiveRating);
         prodCommResult.setPraiseNumber(praiseNumber);
         return prodCommResult;
+    }
+
+    /**
+     * 分页查询前台商品的评论总览
+     * 1.分页查询评论
+     * 2.远程调用获取用户信息
+     * 3.组装数据返回
+     *
+     * @param page
+     * @param prodId
+     * @param evaluate
+     * @return
+     */
+    @Override
+    public Page<ProdComm> getFrontProdCommPage(Page<ProdComm> page, Long prodId, Integer evaluate) {
+
+        Page<ProdComm> prodCommPage = prodCommMapper.selectPage(page, new LambdaQueryWrapper<ProdComm>()
+                .eq(ProdComm::getProdId, prodId)
+                .eq(evaluate != -1, ProdComm::getEvaluate, evaluate)
+                .orderByDesc(ProdComm::getRecTime)
+        );
+        List<ProdComm> prodCommList = prodCommPage.getRecords();
+        if (CollectionUtils.isEmpty(prodCommList)) {
+            return prodCommPage;
+        }
+        // 评论要携带用户信息 远程调用 获取用户信息
+        List<String> userIds = prodCommList.stream()
+                .map(ProdComm::getUserId)
+                .collect(Collectors.toList());
+        // 发远程代用了 userId 获取到一个用户对象
+        List<User> userList = prodCommMemberFeign.findUserInfoByUserIds(userIds);
+        if (!CollectionUtils.isEmpty(userList)) {
+            // 就算没有用户信息回来 我们也正常返回，前台给一个默认值就可以
+            prodCommList.forEach(prodComm -> {
+                User user1 = userList.stream()
+                        .filter(user -> user.getUserId().equals(prodComm.getUserId()))
+                        .collect(Collectors.toList())
+                        .get(0);
+                prodComm.setNickName(user1.getNickName());
+                prodComm.setPic(user1.getPic());
+            });
+        }
+        return prodCommPage;
     }
 }

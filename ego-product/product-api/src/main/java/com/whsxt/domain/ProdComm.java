@@ -137,11 +137,19 @@ public class ProdComm implements Serializable {
      * 评价(0好评 1中评 2差评)
      */
     @TableField(value = "evaluate")
-    @ApiModelProperty(value = "评价(0好评 1中评 2差评)")
+    @ApiModelProperty(value = "评价(0好评 1中评 2差评 3 有图的)")
     private Integer evaluate;
 
     @TableField(exist = false)
     @ApiModelProperty(value = "商品的名称")
     private String prodName;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "用户的名称")
+    private String nickName;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "用户的头像")
+    private String pic;
 
 }

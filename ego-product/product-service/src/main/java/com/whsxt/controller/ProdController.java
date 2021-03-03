@@ -3,12 +3,16 @@ package com.whsxt.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.whsxt.domain.Prod;
+import com.whsxt.domain.Sku;
 import com.whsxt.service.ProdService;
+import com.whsxt.service.SkuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @Author 武汉尚学堂
@@ -20,6 +24,9 @@ public class ProdController {
 
     @Autowired
     private ProdService prodService;
+
+    @Autowired
+    private SkuService skuService;
 
     @GetMapping("page")
     @ApiOperation("分页查询商品")
@@ -54,6 +61,18 @@ public class ProdController {
     public ResponseEntity<Prod> frontFindProdById(Long prodId) {
         Prod prod = prodService.findProdAndSkuById(prodId);
         return ResponseEntity.ok(prod);
+    }
+
+
+    /**
+     * 远程调用根据skuIds查询sku的集合
+     *
+     * @param skuIds
+     * @return
+     */
+    @PostMapping("/getSkuByIds")
+    List<Sku> getSkuByIds(@RequestBody List<Long> skuIds) {
+        return skuService.listByIds(skuIds);
     }
 
 

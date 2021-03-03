@@ -42,4 +42,13 @@ public class ProdCommController {
         return ResponseEntity.ok(prodCommResult);
     }
 
+
+    @GetMapping("prodComm/prodCommPageByProd")
+    @ApiOperation("分页查询前台商品的评论总览")
+    public ResponseEntity<Page<ProdComm>> getFrontProdCommPage(Page<ProdComm> page, Long prodId, Integer evaluate) {
+        Page<ProdComm> prodCommPage = prodCommService.getFrontProdCommPage(page, prodId, evaluate);
+        return ResponseEntity.ok(prodCommPage);
+    }
+
+
 }

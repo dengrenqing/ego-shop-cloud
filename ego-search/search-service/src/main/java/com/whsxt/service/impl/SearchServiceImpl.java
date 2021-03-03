@@ -162,4 +162,19 @@ public class SearchServiceImpl implements SearchService {
         List<ProdEs> prodEsList = (List<ProdEs>) prodEsDao.findAllById(prodIds);
         return prodEsList;
     }
+
+    /**
+     * 根据分类id分页查询商品
+     *
+     * @param cateGoryId
+     * @param current
+     * @param size
+     * @return
+     */
+    @Override
+    public Page<ProdEs> findProdByCategoryId(Long cateGoryId, Integer current, Integer size) {
+        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("categoryId", cateGoryId);
+        Page<ProdEs> page = new Page<>(current, size);
+        return query(termQueryBuilder, page, null, null);
+    }
 }

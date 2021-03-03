@@ -101,4 +101,20 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         // 新增
         return categoryMapper.insert(category) > 0;
     }
+
+    /**
+     * 前台根据父节点查询分类
+     *
+     * @param parentId
+     * @return
+     */
+    @Override
+    public List<Category> findCategoryByParentId(Long parentId) {
+        if (parentId == null) {
+            parentId = 0L;
+        }
+        return categoryMapper.selectList(new LambdaQueryWrapper<Category>()
+                .eq(Category::getParentId, parentId)
+        );
+    }
 }

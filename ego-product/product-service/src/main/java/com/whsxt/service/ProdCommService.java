@@ -28,4 +28,15 @@ public interface ProdCommService extends IService<ProdComm> {
      * @return
      */
     ProdCommResult findFrontProdComm(Long prodId);
+
+    /**
+     * 分页查询前台商品的评论总览
+     *
+     * @param page
+     * @param prodId
+     * @param evaluate
+     * @return
+     */
+    Page<ProdComm> getFrontProdCommPage(Page<ProdComm> page, Long prodId, Integer evaluate);
+
 }

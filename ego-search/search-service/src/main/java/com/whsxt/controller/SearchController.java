@@ -41,6 +41,16 @@ public class SearchController {
     }
 
 
+    @GetMapping("/prod/pageProd")
+    @ApiOperation("根据分类id分页查询商品")
+    public ResponseEntity<Page<ProdEs>> searchProdByCategoryId(Long cateGoryId,
+                                                               @RequestParam(required = false, defaultValue = "0") Integer current,
+                                                               @RequestParam(required = false, defaultValue = "10") Integer size) {
+        Page<ProdEs> prodByCategoryId = searchService.findProdByCategoryId(cateGoryId, current, size);
+        return ResponseEntity.ok(prodByCategoryId);
+    }
+
+
     /**
      * 提供远程调用根据ids查询商品信息
      *

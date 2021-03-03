@@ -39,4 +39,14 @@ public interface SearchService {
      * @return
      */
     List<ProdEs> findProdByIds(List<Long> prodIds);
+
+    /**
+     * 根据分类id分页查询商品
+     *
+     * @param cateGoryId
+     * @param current
+     * @param size
+     * @return
+     */
+    Page<ProdEs> findProdByCategoryId(Long cateGoryId, Integer current, Integer size);
 }

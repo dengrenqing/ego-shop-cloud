@@ -27,4 +27,11 @@ public interface CategoryService extends IService<Category> {
      */
     List<Category> findRootCategory();
 
+    /**
+     * 前台根据父节点查询分类
+     *
+     * @param parentId
+     * @return
+     */
+    List<Category> findCategoryByParentId(Long parentId);
 }

@@ -50,5 +50,11 @@ public class CategoryController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("category/categoryInfo")
+    @ApiOperation("前台根据父节点查询分类")
+    public ResponseEntity<List<Category>> categoryInfo( Long parentId) {
+        List<Category> categoryList = categoryService.findCategoryByParentId(parentId);
+        return ResponseEntity.ok(categoryList);
+    }
 
 }
