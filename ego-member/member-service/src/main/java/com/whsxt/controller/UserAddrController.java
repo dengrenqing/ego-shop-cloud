@@ -1,5 +1,6 @@
 package com.whsxt.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.whsxt.domain.UserAddr;
 import com.whsxt.service.UserAddrService;
 import io.swagger.annotations.Api;
@@ -52,5 +53,20 @@ public class UserAddrController {
         return ResponseEntity.ok().build();
     }
 
+
+    /**
+     * 查询用户的默认收货地址
+     *
+     * @param openId
+     * @return
+     */
+    @GetMapping("p/address/getDefaultAddr")
+    @ApiOperation("查询用户的默认收货地址")
+    UserAddr getDefaultAddr(@RequestParam("openId") String openId) {
+        return userAddrService.getOne(new LambdaQueryWrapper<UserAddr>()
+                .eq(UserAddr::getUserId, openId)
+                .eq(UserAddr::getCommonAddr, 1)
+        );
+    }
 
 }

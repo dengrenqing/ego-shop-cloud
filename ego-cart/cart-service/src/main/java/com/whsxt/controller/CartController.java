@@ -78,4 +78,30 @@ public class CartController {
     }
 
 
+    /**
+     * 提供远程调用购物车 拿到购物车的商品集合
+     *
+     * @param basketIds
+     * @return
+     */
+    @PostMapping("getBasketByIds")
+    @ApiOperation("提供远程调用根据ids查询购物车集合")
+    List<Basket> getBasketByIds(@RequestParam List<Long> basketIds) {
+        return basketService.listByIds(basketIds);
+    }
+
+
+    /**
+     * 远程调用根据用户id和skuIds清空购物车
+     *
+     * @param openId
+     * @param skuIds
+     */
+    @PostMapping("clearCart")
+    @ApiOperation("提供远程调用根据用户id和skuIds清空购物车")
+    void clearCart(@RequestParam("openId") String openId, @RequestParam("skuIds") List<Long> skuIds) {
+        basketService.clearCart(openId, skuIds);
+    }
+
+
 }

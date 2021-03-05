@@ -6,6 +6,7 @@ import com.whsxt.domain.Prod;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @Author 武汉尚学堂
@@ -48,4 +49,11 @@ public interface ProdService extends IService<Prod> {
      * @return
      */
     Prod findProdAndSkuById(Long prodId);
+
+    /**
+     * 修改库存的方法
+     *
+     * @param stockMap
+     */
+    void changeStock(Map<String, Map<Long, Integer>> stockMap);
 }

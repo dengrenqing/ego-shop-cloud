@@ -3,14 +3,15 @@ package com.whsxt.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.whsxt.domain.Order;
 import com.whsxt.service.OrderService;
+import com.whsxt.vo.OrderConfirmResult;
+import com.whsxt.vo.OrderParam;
 import com.whsxt.vo.OrderStatusResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author 武汉尚学堂
@@ -37,6 +38,37 @@ public class OrderController {
         order.setUserId(openId);
         Page<Order> orderPage = orderService.findOrderPage(page, order);
         return ResponseEntity.ok(orderPage);
+    }
+
+    /**
+     * controller写接口信息(参数校验) 不写业务
+     * service 只写业务
+     *
+     * @param orderParam
+     * @return
+     */
+    @PostMapping("/p/order/confirm")
+    @ApiOperation("订单的确认接口")
+    public ResponseEntity<OrderConfirmResult> myOrderPage(@RequestBody OrderParam orderParam) {
+        String openId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        OrderConfirmResult orderConfirmResult = orderService.confirm(openId, orderParam);
+        return ResponseEntity.ok(orderConfirmResult);
+    }
+
+
+    /**
+     * 返回的订单号 我们是string 但是 ajax做数据处理的时候 会把string 转换成大的正型  就会出现精度确实
+     * 返回的时候 不要返回纯数字
+     *
+     * @param orderConfirmResult
+     * @return
+     */
+    @PostMapping("/p/order/submit")
+    @ApiOperation("订单的提交")
+    public ResponseEntity<String> myOrderSubmit(@RequestBody OrderConfirmResult orderConfirmResult) {
+        String openId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        String orderNum = orderService.submit(openId, orderConfirmResult);
+        return ResponseEntity.ok("orderNum:" + orderNum);
     }
 
 

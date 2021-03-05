@@ -157,7 +157,7 @@ public class ImportServiceImpl implements ImportService, CommandLineRunner {
      * 2. order-service 把减库存的消息放入 mq   prodId  count  Map<Long,Integer>
      * 3. 我们处理消息
      */
-//    @RabbitListener(queues = QueueConstant.PROD_CHANGE_QUEUE, concurrency = "3-5")
+    @RabbitListener(queues = QueueConstant.PROD_CHANGE_QUEUE, concurrency = "3-5")
     public void quickImportByMq(Message message, Channel channel) {
         // 拿到消息体
         String msgStr = new String(message.getBody());
@@ -176,8 +176,7 @@ public class ImportServiceImpl implements ImportService, CommandLineRunner {
             Long prodId = prodEs.getProdId();
             // 改变的数量
             Integer count = prodInfo.getInteger(String.valueOf(prodId));
-            // 操作数量的改变
-
+            // 操作数量的改变  方便做增加和减少的
             long finalCount = prodEs.getTotalStocks() + count;
             if (finalCount < 0) {
                 log.error("修改es的库存小于0了");

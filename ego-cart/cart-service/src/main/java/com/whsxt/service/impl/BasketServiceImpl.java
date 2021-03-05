@@ -209,4 +209,18 @@ public class BasketServiceImpl extends ServiceImpl<BasketMapper, Basket> impleme
         cartMoney.setTotalMoney(totalMoney);
         return cartMoney;
     }
+
+    /**
+     * 远程调用根据用户id和skuIds清空购物车
+     *
+     * @param openId
+     * @param skuIds
+     */
+    @Override
+    public void clearCart(String openId, List<Long> skuIds) {
+        basketMapper.delete(new LambdaQueryWrapper<Basket>()
+                .eq(Basket::getUserId, openId)
+                .in(Basket::getSkuId, skuIds)
+        );
+    }
 }

@@ -24,4 +24,7 @@ public interface ProdCommMemberFeign {
     List<User> findUserInfoByUserIds(@RequestBody List<String> userIds);
 
 
+
+
+
 }

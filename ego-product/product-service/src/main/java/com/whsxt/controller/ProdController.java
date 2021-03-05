@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author 武汉尚学堂
@@ -71,8 +72,21 @@ public class ProdController {
      * @return
      */
     @PostMapping("/getSkuByIds")
+    @ApiOperation("根据skuIds查询sku的集合")
     List<Sku> getSkuByIds(@RequestBody List<Long> skuIds) {
         return skuService.listByIds(skuIds);
+    }
+
+
+    /**
+     * 修改库存的方法
+     *
+     * @param stockMap
+     */
+    @PostMapping("changeStock")
+    @ApiOperation("修改库存的方法")
+    void changeStock(@RequestBody Map<String, Map<Long, Integer>> stockMap) {
+        prodService.changeStock(stockMap);
     }
 
 

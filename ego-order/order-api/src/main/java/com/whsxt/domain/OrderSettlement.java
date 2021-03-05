@@ -111,7 +111,7 @@ public class OrderSettlement implements Serializable {
      * 支付状态
      */
     @TableField(value = "pay_status")
-    @ApiModelProperty(value="支付状态")
+    @ApiModelProperty(value="支付状态(0：未支付 1 已经支付)")
     private Integer payStatus;
 
     private static final long serialVersionUID = 1L;

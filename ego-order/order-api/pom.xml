@@ -14,7 +14,12 @@
     <dependencies>
         <dependency>
             <groupId>com.whsxt</groupId>
-            <artifactId>ego-common</artifactId>
+            <artifactId>member-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.whsxt</groupId>
+            <artifactId>cart-api</artifactId>
             <version>1.0</version>
         </dependency>
     </dependencies>
