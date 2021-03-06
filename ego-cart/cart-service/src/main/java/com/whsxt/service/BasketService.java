@@ -43,4 +43,12 @@ public interface BasketService extends IService<Basket> {
      * @return
      */
     CartMoney calcMoney(List<Long> basketIds);
+
+    /**
+     * 远程调用根据用户id和skuIds清空购物车
+     *
+     * @param openId
+     * @param skuIds
+     */
+    void clearCart(String openId, List<Long> skuIds);
 }

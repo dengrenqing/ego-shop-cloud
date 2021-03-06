@@ -14,6 +14,7 @@
         <module>ego-message</module>
         <module>ego-cart</module>
         <module>ego-order</module>
+        <module>ego-pay</module>
     </modules>
     <!--父项目还是boot项目-->
     <parent>

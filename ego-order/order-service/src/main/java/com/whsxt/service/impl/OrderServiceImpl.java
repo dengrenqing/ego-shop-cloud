@@ -37,6 +37,7 @@ import com.whsxt.mapper.OrderMapper;
 import com.whsxt.service.OrderService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @Author 武汉尚学堂
@@ -340,7 +341,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         wxMsgModel.setToUser("oy_5Lv95ANQGqolUcwyRfNI_1BOQ");
         wxMsgModel.setTopColor("#173177");
         wxMsgModel.setTemplateId("4X8kV75LFlVs_T1WOKCEPHSB-DFDkJ_ePEJCn3TuIUw");
-        wxMsgModel.setToUser("https://www.baidu.com");
+        wxMsgModel.setUrl("https://www.baidu.com");
         HashMap<String, Map<String, String>> data = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String time = sdf.format(new Date());
@@ -537,5 +538,34 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 .collect(Collectors.toList());
         // 远程调用清空购物车
         orderCartFeign.clearCart(openId, skuIds);
+    }
+
+    /**
+     * 修改订单状态为已经支付
+     *
+     * @param orderNum
+     */
+    @Override
+    public void changeOrderIsPay(String orderNum) {
+        Order order = orderMapper.selectOne(new LambdaQueryWrapper<Order>()
+                .eq(Order::getOrderNumber, orderNum)
+        );
+        if (!ObjectUtils.isEmpty(order)) {
+            order.setStatus(2);
+            order.setIsPayed(1);
+            order.setPayTime(new Date());
+            order.setUpdateTime(new Date());
+            orderMapper.updateById(order);
+        }
+        // 更新订单结算表
+        OrderSettlement orderSettlement = orderSettlementMapper.selectOne(new LambdaQueryWrapper<OrderSettlement>()
+                .eq(OrderSettlement::getOrderNumber, orderNum)
+        );
+        if (!ObjectUtils.isEmpty(orderSettlement)) {
+            orderSettlement.setClearingTime(new Date());
+            orderSettlement.setPayStatus(1);
+            orderSettlement.setIsClearing(1);
+            orderSettlementMapper.updateById(orderSettlement);
+        }
     }
 }

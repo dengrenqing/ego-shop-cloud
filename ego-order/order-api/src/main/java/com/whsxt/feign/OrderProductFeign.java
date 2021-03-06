@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @Author 武汉尚学堂
  */
-@FeignClient(value = "product-service", fallback = OrderProductFeignHystrix.class)
+@FeignClient(value = "product-service"/*, fallback = OrderProductFeignHystrix.class*/)
 public interface OrderProductFeign {
 
 

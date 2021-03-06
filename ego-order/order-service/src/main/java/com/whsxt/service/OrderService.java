@@ -48,4 +48,10 @@ public interface OrderService extends IService<Order> {
      */
     String submit(String openId, OrderConfirmResult orderConfirmResult);
 
+    /**
+     * 修改订单状态为已经支付
+     *
+     * @param orderNum
+     */
+    void changeOrderIsPay(String orderNum);
 }

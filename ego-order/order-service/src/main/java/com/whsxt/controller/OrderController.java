@@ -1,5 +1,6 @@
 package com.whsxt.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.whsxt.domain.Order;
 import com.whsxt.service.OrderService;
@@ -11,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -69,6 +71,44 @@ public class OrderController {
         String openId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         String orderNum = orderService.submit(openId, orderConfirmResult);
         return ResponseEntity.ok("orderNum:" + orderNum);
+    }
+
+
+    @GetMapping("/p/order/query")
+    @ApiOperation("订单的支付状态查询")
+    public ResponseEntity<String> queryOrderStatus(String orderSn) {
+        Order order = orderService.getOne(new LambdaQueryWrapper<Order>()
+                .eq(Order::getOrderNumber, orderSn)
+                .eq(Order::getIsPayed, 1)
+        );
+        return ResponseEntity.ok(order != null ? "ok" : "fail");
+    }
+
+
+    /**
+     * 远程调用 根据订单号 拿到订单对象
+     *
+     * @param orderNum
+     * @return
+     */
+    @PostMapping("getOrderByOrderNum")
+    @ApiOperation("根据订单号拿到订单对象")
+    Order getOrderByOrderNum(@RequestParam String orderNum) {
+        return orderService.getOne(new LambdaQueryWrapper<Order>()
+                .eq(Order::getOrderNumber, orderNum)
+        );
+    }
+
+
+    /**
+     * 修改订单状态 为已经支付
+     *
+     * @param orderNum
+     */
+    @PostMapping("/changeOrderStatus")
+    @ApiOperation("修改订单状态为已经支付")
+    void changeOrderStatus(@RequestParam String orderNum) {
+        orderService.changeOrderIsPay(orderNum);
     }
 
 

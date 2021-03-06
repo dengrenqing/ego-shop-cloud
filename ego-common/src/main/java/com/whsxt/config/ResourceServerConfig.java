@@ -86,7 +86,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
                 "/webjars/**",
                 "/swagger-ui/**",
                 "/druid/**",
-                "/actuator/**"
+                "/actuator/**",
+                "/payNotify/**" // 支付宝调用我们 相当于就是正常的客户端请求服务器 要放行这个接口
         ).permitAll()
                 .antMatchers("/**")
                 .authenticated()
